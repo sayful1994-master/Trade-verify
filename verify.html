@@ -6,7 +6,7 @@
     <title>Certificate Verification - The Commercial Bible</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Firebase SDK (Compat version for simple HTML use) -->
+    <!-- Firebase SDK (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
@@ -36,14 +36,15 @@
     </div>
 
     <script>
-        // আপনার ফায়ারবেস প্রজেক্টের কনফিগারেশন এখানে বসাবেন
+        // আপনার অরিজিনাল ফায়ারবেস কনফিগারেশন
         const firebaseConfig = {
-            apiKey: "YOUR_FIREBASE_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
+            apiKey: "AIzaSyCShfO9N0vvw_wi4KIpB-fOXg0s4eJKrc",
+            authDomain: "commercial-bible-app.firebaseapp.com",
+            projectId: "commercial-bible-app",
+            storageBucket: "commercial-bible-app.firebasestorage.app",
+            messagingSenderId: "917248966117",
+            appId: "1:917248966117:web:0ad16f2e84837dd021030c",
+            measurementId: "G-G9P4EBEHY2"
         };
 
         // Firebase Initialize
@@ -63,7 +64,7 @@
             }
 
             try {
-                // ফায়ারবেস থেকে ডেটা ফেচ করা
+                // Firestore-এর 'certificates' কালেকশন থেকে সার্চ করা
                 const docRef = await db.collection("certificates").doc(certId).get();
                 
                 document.getElementById('loading').classList.add('hidden');
