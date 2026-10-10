@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Verification - The Commercial Bible</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK (Compat version for simple HTML use) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-slate-800 p-8 rounded-2xl shadow-xl max-w-md w-full border border-slate-700 text-center">
+        <h1 class="text-2xl font-bold mb-2 text-amber-400">The Commercial Bible</h1>
+        <p class="text-sm text-slate-400 mb-6">Official Certificate Verification</p>
+
+        <div id="loading" class="text-slate-300 py-6">Verifying certificate, please wait...</div>
+
+        <div id="result-container" class="hidden text-left space-y-4">
+            <div class="bg-emerald-900/40 border border-emerald-500 text-emerald-300 p-3 rounded-lg text-center font-medium">
+                ✅ Valid & Authentic Certificate
+            </div>
+            <div class="border-t border-slate-700 pt-4 space-y-2 text-sm">
+                <p><span class="text-slate-400">Certificate ID:</span> <span id="cert-id" class="font-mono text-amber-300"></span></p>
+                <p><span class="text-slate-400">Recipient Name:</span> <span id="cert-name" class="font-bold text-lg"></span></p>
+                <p><span class="text-slate-400">Course Title:</span> <span id="cert-course" class="font-semibold text-blue-300"></span></p>
+                <p><span class="text-slate-400">Issue Date:</span> <span id="cert-date"></span></p>
+            </div>
+        </div>
+
+        <div id="error-container" class="hidden bg-rose-900/40 border border-rose-500 text-rose-300 p-4 rounded-lg">
+            ❌ Invalid Certificate ID or Not Found in Database.
+        </div>
+    </div>
+
+    <script>
+        // আপনার ফায়ারবেস প্রজেক্টের কনফিগারেশন এখানে বসাবেন
+        const firebaseConfig = {
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+
+        // Firebase Initialize
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // URL থেকে ID বের করা (যেমন: verify.html?id=TCB-2026-IMP-1001)
+        const urlParams = new URLSearchParams(window.location.search);
+        const certId = urlParams.get('id');
+
+        async function verifyCertificate() {
+            if (!certId) {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-container').classList.remove('hidden');
+                document.getElementById('error-container').innerText = "Error: No Certificate ID provided in the link.";
+                return;
+            }
+
+            try {
+                // ফায়ারবেস থেকে ডেটা ফেচ করা
+                const docRef = await db.collection("certificates").doc(certId).get();
+                
+                document.getElementById('loading').classList.add('hidden');
+
+                if (docRef.exists) {
+                    const data = docRef.data();
+                    document.getElementById('cert-id').innerText = certId;
+                    document.getElementById('cert-name').innerText = data.userName;
+                    document.getElementById('cert-course').innerText = data.courseTitle;
+                    document.getElementById('cert-date').innerText = data.issueDate;
+                    
+                    document.getElementById('result-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('error-container').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error fetching certificate:", error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-container').classList.remove('hidden');
+                document.getElementById('error-container').innerText = "Database connection error!";
+            }
+        }
+
+        verifyCertificate();
+    </script>
+</body>
+</html>
