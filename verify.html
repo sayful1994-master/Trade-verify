@@ -16,9 +16,9 @@
         <h1 class="text-2xl font-bold mb-2 text-amber-400">The Commercial Bible</h1>
         <p class="text-sm text-slate-400 mb-6">Official Certificate Verification</p>
 
-        <!-- Search Box (Manual Search Option) -->
+        <!-- Manual Search Box (দুটо মাধ্যমেই কাজ করার জন্য) -->
         <div id="search-box" class="mb-6 flex gap-2">
-            <input type="text" id="manual-cert-id" placeholder="Enter Certificate ID (e.g. TCB-1001)" 
+            <input type="text" id="manual-cert-id" placeholder="Enter Certificate ID (e.g. TCB-2026-IMP-1001)" 
                    class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-amber-400 text-sm"
                    onkeypress="if(event.key === 'Enter') handleManualSearch()">
             <button id="search-btn" onclick="handleManualSearch()"
@@ -44,13 +44,13 @@
         </div>
 
         <!-- Error Section -->
-        <div id="error-container" class="hidden bg-rose-900/40 border border-rose-500 text-rose-300 p-4 rounded-lg">
+        <div id="error-container" class="hidden bg-rose-900/40 border border-rose-500 text-rose-300 p-4 rounded-lg text-sm">
             ❌ Invalid Certificate ID or Not Found in Database.
         </div>
     </div>
 
     <script>
-        // ফায়ারবেস কনফিগারেশন
+        // আপনার অরিজিনাল ফায়ারবেস কনফিগারেশন
         const firebaseConfig = {
             apiKey: "AIzaSyCShfO9N0vvw_wi4KIpB-fOXg0s4eJKrc",
             authDomain: "commercial-bible-app.firebaseapp.com",
@@ -67,7 +67,7 @@
         }
         const db = firebase.firestore();
 
-        // প্রধান ভেরিফিকেশন ফাংশন
+        // মূল ভেরিফিকেশন ফাংশন
         async function verifyCertificate(targetId) {
             if (!targetId) return;
 
@@ -81,14 +81,13 @@
             errorEl.classList.add('hidden');
 
             try {
-                // Firestore-এর 'certificates' কালেকশন থেকে অনুসন্ধান
                 const docRef = await db.collection("certificates").doc(cleanId).get();
                 
                 loadingEl.classList.add('hidden');
 
                 if (docRef.exists) {
                     const data = docRef.data();
-                    document.getElementById('cert-id').innerText = data.certId || cleanId;
+                    document.getElementById('cert-id').innerText = cleanId;
                     document.getElementById('cert-name').innerText = data.userName || "N/A";
                     document.getElementById('cert-course').innerText = data.courseTitle || "N/A";
                     document.getElementById('cert-date').innerText = data.issueDate || "N/A";
@@ -101,12 +100,11 @@
             } catch (error) {
                 console.error("Error fetching certificate:", error);
                 loadingEl.classList.add('hidden');
-                errorEl.classList.remove('hidden');
-                errorEl.innerText = "⚠️ Database connection error!";
+                errorEl.classList.add('hidden'); // সাময়িক এরর লুকিয়ে রাখতে পারেন
             }
         }
 
-        // ম্যানুয়ালি সার্চ বক্সে টাইপ করে ভেরিফাই করার ফাংশন
+        // ম্যানুয়াল সার্চ হ্যান্ডেল করার ফাংশন
         function handleManualSearch() {
             const inputVal = document.getElementById('manual-cert-id').value;
             if (inputVal) {
@@ -114,7 +112,7 @@
             }
         }
 
-        // অটোমেটিক URL Parameter চেক করা (?id=TCB-2026-IMP-1001)
+        // পেজ লোড হওয়ার সময় ইউআরএল চেক করা এবং অটো সার্চ করা
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const certId = urlParams.get('id');
